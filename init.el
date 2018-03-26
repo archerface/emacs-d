@@ -113,7 +113,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
 ;; A lot of font modifications, all pretty much stolen from:
 ;; https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.org
 (setq default-font "Inconsolata")
-(setq default-font-size 15)
+(setq default-font-size 17)
 (setq current-font-size default-font-size)
 (setq font-change-increment 1.1)
 
