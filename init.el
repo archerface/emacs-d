@@ -166,13 +166,13 @@ other, future frames."
 
 (reset-font-size)
 
-(use-package mode-icons
-	:ensure t
-	:init
-	(mode-icons-mode 1))
+;; (use-package mode-icons
+;; 	:ensure t
+;; 	:init
+;; 	(mode-icons-mode 1))
 
-(use-package all-the-icons
-  :ensure t)
+;; (use-package all-the-icons
+;;   :ensure t)
 
 (use-package multi-term
   :ensure t)
