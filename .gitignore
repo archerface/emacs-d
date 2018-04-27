@@ -65,5 +65,5 @@ tramp
 network-security.data
 ido.last
 
-./elispConfigFiles/secrets/
-elpa
+/elispConfigFiles/secrets/
+/elpa/
