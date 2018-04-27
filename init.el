@@ -45,12 +45,15 @@
 (sensible-defaults/use-all-keybindings)
 (init-package-manager)
 
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
+(use-package exec-path-from-shell
+  :ensure t
+	:init
+	(when (memq window-system '(mac ns x))
+		(exec-path-from-shell-initialize)))
 
 (defun ui-settings ()
   "GUI settings for Emacs."
@@ -67,7 +70,8 @@
   (setq frame-title-format
         '("" (:eval (if (buffer-file-name)
                         (abbreviate-file-name (buffer-file-name))
-                      "%b")))))
+                      "%b"))))
+  (set-face-attribute 'mode-line nil :height 30))
 
 (defun global-editor-settings ()
   "Minor settings for every editing mode."
@@ -94,6 +98,7 @@
   (setq x-underline-at-descent-line t)
   (use-package solarized-theme
     :ensure t
+    :pin melpa-stable
     :config
     (load-theme 'solarized-dark t)))
 
@@ -161,10 +166,16 @@ other, future frames."
 
 (reset-font-size)
 
-(mode-icons-mode 1)
-(use-package all-the-icons)
+(use-package mode-icons
+	:ensure t
+	:init
+	(mode-icons-mode 1))
 
-(use-package multi-term)
+(use-package all-the-icons
+  :ensure t)
+
+(use-package multi-term
+  :ensure t)
 (defun multi-term-fish ()
   "Make multiterm use fish."
   (interactive)
@@ -194,10 +205,13 @@ other, future frames."
 
 (electric-pair-mode 1)
 
-(require 'req-package)
-(req-package company
-	     :require yasnippet
-	     :config (progn (global-company-mode 1)
+(use-package yasnippet
+  :ensure t)
+
+(use-package req-package
+  :ensure t
+  :config
+  (progn (global-company-mode 1)
 			    (setq company-idle-delay 0)
 			    (setq company-show-numbers t)
 			    (setq company-minimum-prefix-length 2)
@@ -209,46 +223,63 @@ other, future frames."
 			    (setq company-code-ignore-case t)
 			    (global-set-key (kbd "C-<tab>") 'company-dabbrev)
 			    (global-set-key (kbd "M-<tab>") 'company-complete)
-			    (global-set-key (kbd "C-c C-y") 'company-yasnippet)))
+			    (global-set-key (kbd "C-c C-y") 'company-yasnippet))
+  (add-hook 'after-init-hook 'global-company-mode))
 
-(req-package company-quickhelp
-	     :require company
-	     :config (company-quickhelp-mode 1))
+(use-package company-quickhelp
+	     :ensure t
+	     :config
+       (company-quickhelp-mode 1))
 
 (provide 'init-company)
-(add-hook 'after-init-hook 'global-company-mode)
 
 ;; ido part
+(use-package ido-completing-read+
+	:ensure t
+	:init
+	(ido-ubiquitous-mode)
+	(setq ido-enable-flex-matching t)
+	(setq ido-everywhere t)
+	(setq ido-create-new-buffer 'always))
+
+(use-package flx-ido
+	:ensure t
+	:init
+	(flx-ido-mode 1))
+
+(use-package ido-vertical-mode
+	:ensure t
+	:init
+	(ido-vertical-mode 1)
+	(setq ido-vertical-define-keys 'C-n-and-C-p-only))
+
 (ido-mode 1)
-(ido-ubiquitous-mode)
-(flx-ido-mode 1)
-(ido-vertical-mode 1)
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(setq ido-create-new-buffer 'always)
-(setq ido-vertical-define-keys 'C-n-and-C-p-only)
 
 (use-package smex
+  :ensure t
   :commands (smex smex-major-mode-commands)
   :bind
   (("M-x" . smex)
    ("M-X" . smex-major-mode-commands)))
 (smex-initialize)
 
+(use-package diff-hl
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
+  (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode))
 
-(require 'diff-hl)
-(add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
-(add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
-
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(use-package web-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
 
 ;; indentation adjustments for web-mode
 (defun my-web-mode-hook ()
@@ -272,16 +303,18 @@ other, future frames."
 ;; flycheck config
 (defun flycheck-settings ()
   "Defines flycheck customizations for Emacs."
-  (require 'flycheck)
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  (setq-default flycheck-disabled-checkers
-                (append flycheck-disabled-checkers
-                        '(javascript-jshint)))
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-mode 'javascript-eslint 'js-mode)
-  (setq-default flycheck-disabled-checkers
-                (append flycheck-disabled-checkers
-                        '(json-jsonlint))))
+  (use-package flycheck
+    :ensure t
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode)
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(javascript-jshint)))
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-add-mode 'javascript-eslint 'js-mode)
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(json-jsonlint)))))
 
 (defun use-eslint-from-node-modules ()
   "Function to use local eslint executable if it is available."
@@ -321,23 +354,28 @@ other, future frames."
 (setq scss-compile-at-save nil)
 
 ;; adding a less config
-(require 'less-css-mode)
+(use-package less-css-mode
+  :ensure t)
 
-(auto-highlight-symbol-mode 1)
-(global-whitespace-cleanup-mode 1)
+(use-package auto-highlight-symbol
+  :ensure t
+  :init
+  (auto-highlight-symbol-mode 1))
 
-(require 'discover)
-(global-discover-mode)
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :init
+  (global-whitespace-cleanup-mode 1))
 
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-(require 'org-alert)
-(setq alert-default-style 'libnotify)
+(use-package discover
+  :ensure t
+  :init
+  (global-discover-mode))
 
-;; diff hl config ;;
-(require 'diff-hl)
-(add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
-(add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
+(use-package org-bullets
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (add-hook 'gfm-mode 'flyspell-mode)
 
@@ -346,27 +384,33 @@ other, future frames."
 (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
 ;; Ivy Config
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-height 15)
-(setq ivy-count-format "(%d/%d) ")
-(setq ivy-initial-inputs-alist nil)
+(use-package ivy
+  :ensure t
+  :init
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-height 15)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-initial-inputs-alist nil)
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "<f6>") 'ivy-resume))
 
-(global-set-key "\C-s" 'swiper)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "<f6>") 'ivy-resume)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-c k") 'counsel-ag)
-(global-set-key (kbd "C-x l") 'counsel-locate)
-(global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+(use-package counsel
+  :ensure t
+  :config
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+  (global-set-key (kbd "C-c g") 'counsel-git)
+  (global-set-key (kbd "C-c j") 'counsel-git-grep)
+  (global-set-key (kbd "C-c k") 'counsel-ag)
+  (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
 
 ;; Php-mode ;;
 (load-file "~/.emacs.d/elispConfigFiles/php-mode.el")
@@ -379,44 +423,20 @@ other, future frames."
 (setq php-executable "/usr/bin/php")
 (add-hook 'php-mode-hook 'flycheck-mode)
 
-;; Flycheck Mode ;;
-(add-hook 'after-init-hook #'global-flycheck-mode)
-
 ;; Tramp Customizations ;;
 (setq tramp-verbose 10)
 
 ;; rainbows ;;
-(require 'rainbow-delimiters)
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'elisp-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'php-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'css-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'web-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'js-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'rust-mode-hook 'rainbow-delimiters-mode)
-
-;; rust settings ;;
-(require 'rust-mode)
-(setq rust-format-on-save t)
-(add-hook 'rust-mode-hook #'racer-mode)
-(add-hook 'racer-mode-hook #'company-mode)
-(define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
-(setq company-tooltip-align-annotations t)
-
-;; Encryption Stuff ;;
-(require 'epa-file)
-(epa-file-enable)
-
-;; Language Sever Protocol ;;
-(add-to-list 'load-path "~/Documents/lsp-mode/")
-(with-eval-after-load 'lsp-mode
-  (require 'lsp-flycheck))
-(require 'lsp-mode)
-(add-hook 'prog-major-mode #'lsp-mode)
-
-;; LSP python
-(require 'lsp-python)
-(add-hook 'python-mode-hook #'lsp-mode)
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'elisp-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'php-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'css-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'web-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'js-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'rust-mode-hook 'rainbow-delimiters-mode))
 
 (load-file "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
 (require 'ssh-connects)
@@ -439,4 +459,10 @@ other, future frames."
  '(js-indent-level 2)
  '(package-selected-packages
    (quote
-    (zenburn beacon zenburn-theme yaml-mode whitespace-cleanup-mode web-mode web-beautify tern solarized-theme smooth-scrolling smex slime scss-mode restclient req-package rainbow-mode rainbow-delimiters racer prettier-js powerline phpcbf php-extras panda-theme org-bullets org-alert nord-theme neotree multi-term moe-theme mode-icons markdown-mode magit lsp-python lsp-javascript-typescript less-css-mode json-mode jsfmt js-format irony-eldoc indent-guide ido-vertical-mode ido-ubiquitous highlight-symbol highlight-indent-guides helm gruber-darker-theme git-messenger git-gutter geben flycheck-pos-tip flycheck-popup-tip flycheck-color-mode-line flx-ido exec-path-from-shell eslintd-fix eslint-fix engine-mode eclim dumb-jump dracula-theme discover diff-hl counsel-projectile company-racer company-php company-lsp company-irony company-flx column-marker color-theme-sanityinc-tomorrow cmake-ide cider base16-theme avy auto-highlight-symbol apropospriate-theme all-the-icons-ivy))))
+    (epa-file company-quickhelp zenburn beacon zenburn-theme yaml-mode whitespace-cleanup-mode web-mode web-beautify tern solarized-theme smooth-scrolling smex slime scss-mode restclient req-package rainbow-mode rainbow-delimiters racer prettier-js powerline phpcbf php-extras panda-theme org-bullets org-alert nord-theme neotree multi-term moe-theme mode-icons markdown-mode magit lsp-python lsp-javascript-typescript less-css-mode json-mode jsfmt js-format irony-eldoc indent-guide ido-vertical-mode ido-ubiquitous highlight-symbol highlight-indent-guides helm gruber-darker-theme git-messenger git-gutter geben flycheck-pos-tip flycheck-popup-tip flycheck-color-mode-line flx-ido exec-path-from-shell eslintd-fix eslint-fix engine-mode eclim dumb-jump dracula-theme discover diff-hl counsel-projectile company-racer company-php company-lsp company-irony company-flx column-marker color-theme-sanityinc-tomorrow cmake-ide cider base16-theme avy auto-highlight-symbol apropospriate-theme all-the-icons-ivy))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
