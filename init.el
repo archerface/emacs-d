@@ -174,18 +174,17 @@ other, future frames."
 (use-package company
   :ensure t
   :config
-  (progn
-    (setq-default company-dabbrev-code-other-buffer 'all)
-		(setq-default company-code-everywhere t)
-    (setq-default company-dabbrev-downcase nil)
-		(setq-default company-dabbrev-other-buffers t)
-    (setq company-idle-delay 0)
-		(setq company-show-numbers t)
-		(setq company-minimum-prefix-length 2)
-		(setq company-auto-complete nil)
-		(global-set-key (kbd "C-<tab>") 'company-dabbrev)
-		(global-set-key (kbd "M-<tab>") 'company-complete)
-		(global-set-key (kbd "C-c C-y") 'company-yasnippet))
+  (setq-default company-dabbrev-code-other-buffer 'all)
+	(setq-default company-code-everywhere t)
+  (setq-default company-dabbrev-downcase nil)
+	(setq-default company-dabbrev-other-buffers t)
+  (setq company-idle-delay 0)
+	(setq company-show-numbers t)
+	(setq company-minimum-prefix-length 2)
+	(setq company-auto-complete nil)
+	(global-set-key (kbd "C-<tab>") 'company-dabbrev)
+	(global-set-key (kbd "M-<tab>") 'company-complete)
+	(global-set-key (kbd "C-c C-y") 'company-yasnippet)
   (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package company-quickhelp
