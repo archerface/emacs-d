@@ -37,7 +37,7 @@
 	       '("melpa" . "http://melpa.org/packages/") t)
   (add-to-list 'package-archives
 	       '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-  (setq package-archive-enable-alist '(("melpa" deft magit)))
+  (setq-default package-archive-enable-alist '(("melpa" deft magit)))
   (package-initialize))
 
 (load-file "~/.emacs.d/elispConfigFiles/sensible-defaults.el")
@@ -78,27 +78,28 @@
   (show-paren-mode 1)
   (global-subword-mode 1)
   (global-prettify-symbols-mode t)
-  (setq show-paren-delay 0)
+  (setq-default tab-width 2)
+  (setq-default show-paren-delay 0)
+  (setq-default compilation-scroll-output t)
+  (setq-default x-select-enable-clipboard t)
   (setq scroll-margin 0)
   (setq scroll-conservatively 100000)
-  (setq scroll-preserve-screen-position 1)
-  (setq compilation-scroll-output t)
-  (setq x-select-enable-clipboard t)
-  (setq-default tab-width 2))
+  (setq scroll-preserve-screen-position 1))
 
 (defun set-solarized-theme ()
   "Set up and run solarized theme."
-  (fringe-mode 15)
-  (setq solarized-use-variable-pitch nil)
-  (setq solarized-high-contrast-mode-line nil)
-  (setq solarized-use-less-bold t)
-  (setq solarized-use-more-italic nil)
-  (setq solarized-emphasize-indicators t)
-  (setq solarized-scale-org-headlines nil)
-  (setq x-underline-at-descent-line t)
   (use-package solarized-theme
     :ensure t
     :pin melpa-stable
+    :init
+    (fringe-mode 15)
+    (setq-default solarized-use-variable-pitch nil)
+    (setq-default solarized-high-contrast-mode-line nil)
+    (setq-default solarized-use-less-bold t)
+    (setq-default solarized-use-more-italic nil)
+    (setq-default solarized-emphasize-indicators t)
+    (setq-default solarized-scale-org-headlines nil)
+    (setq x-underline-at-descent-line t)
     :config
     (load-theme 'solarized-dark t)))
 
@@ -118,18 +119,14 @@ THEME-FUNCTION: function that initializes the themes and settings."
 (global-editor-settings)
 (apply-theme 'set-solarized-theme)
 
-;; A lot of font modifications, all pretty much stolen from:
-;; https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.org
-(setq default-font "Inconsolata")
+(setq-default default-font "Inconsolata")
 (if (eq system-type 'darwin)
-    (setq default-font-size 17)
-  (setq default-font-size 15))
-(setq current-font-size default-font-size)
-(setq font-change-increment 1.1)
+    (setq-default default-font-size 17)
+  (setq-default default-font-size 15))
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
-  (concat default-font "-" (number-to-string current-font-size)))
+  (concat default-font "-" (number-to-string default-font-size)))
 
 (defun set-font-size ()
   "Set the font to `default-font' at `current-font-size'.
@@ -138,43 +135,7 @@ other, future frames."
   (let ((font-code (font-code)))
     (add-to-list 'default-frame-alist (cons 'font font-code))
     (set-frame-font font-code)))
-
-(defun reset-font-size ()
-  "Change font size back to `default-font-size'."
-  (interactive)
-  (setq current-font-size default-font-size)
-  (set-font-size))
-
-(defun increase-font-size ()
-  "Increase current font size by a factor of `font-change-increment'."
-  (interactive)
-  (setq current-font-size
-        (ceiling (* current-font-size font-change-increment)))
-  (set-font-size))
-
-(defun decrease-font-size ()
-  "Decrease current font size by a factor of `font-change-increment', down to a minimum size of 1."
-  (interactive)
-  (setq current-font-size
-        (max 1
-             (floor (/ current-font-size font-change-increment))))
-  (set-font-size))
-
-(define-key global-map (kbd "C-)") 'reset-font-size)
-(define-key global-map (kbd "C-+") 'increase-font-size)
-(define-key global-map (kbd "C-=") 'increase-font-size)
-(define-key global-map (kbd "C-_") 'decrease-font-size)
-(define-key global-map (kbd "C--") 'decrease-font-size)
-
-(reset-font-size)
-
-;; (use-package mode-icons
-;; 	:ensure t
-;; 	:init
-;; 	(mode-icons-mode 1))
-
-;; (use-package all-the-icons
-;;   :ensure t)
+(set-font-size)
 
 (use-package multi-term
   :ensure t)
@@ -213,18 +174,18 @@ other, future frames."
 (use-package company
   :ensure t
   :config
-  (progn (setq company-idle-delay 0)
-				 (setq company-show-numbers t)
-				 (setq company-minimum-prefix-length 2)
-				 (setq company-dabbrev-downcase nil)
-				 (setq company-dabbrev-other-buffers t)
-				 (setq company-auto-complete nil)
-				 (setq company-dabbrev-code-other-buffer 'all)
-				 (setq company-code-everywhere t)
-				 (setq company-code-ignore-case t)
-				 (global-set-key (kbd "C-<tab>") 'company-dabbrev)
-				 (global-set-key (kbd "M-<tab>") 'company-complete)
-				 (global-set-key (kbd "C-c C-y") 'company-yasnippet))
+  (progn
+    (setq-default company-dabbrev-code-other-buffer 'all)
+		(setq-default company-code-everywhere t)
+    (setq-default company-dabbrev-downcase nil)
+		(setq-default company-dabbrev-other-buffers t)
+    (setq company-idle-delay 0)
+		(setq company-show-numbers t)
+		(setq company-minimum-prefix-length 2)
+		(setq company-auto-complete nil)
+		(global-set-key (kbd "C-<tab>") 'company-dabbrev)
+		(global-set-key (kbd "M-<tab>") 'company-complete)
+		(global-set-key (kbd "C-c C-y") 'company-yasnippet))
   (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package company-quickhelp
@@ -302,20 +263,15 @@ other, future frames."
   (exec-path-from-shell-initialize))
 
 ;; flycheck config
-(defun flycheck-settings ()
-  "Defines flycheck customizations for Emacs."
-  (use-package flycheck
-    :ensure t
-    :config
-    (add-hook 'after-init-hook #'global-flycheck-mode)
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(javascript-jshint)))
-    (flycheck-add-mode 'javascript-eslint 'web-mode)
-    (flycheck-add-mode 'javascript-eslint 'js-mode)
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(json-jsonlint)))))
+(use-package flycheck
+	:ensure t
+	:init
+	(setq-default flycheck-highlighting-mode 'lines)
+	(setq-default flycheck-disabled-checkers '(javascript-jshint))
+	:config
+	(add-hook 'after-init-hook 'global-flycheck-mode)
+	(flycheck-add-mode 'javascript-eslint 'web-mode)
+	(flycheck-add-mode 'javascript-eslint 'js-mode))
 
 (defun use-eslint-from-node-modules ()
   "Function to use local eslint executable if it is available."
@@ -341,28 +297,20 @@ other, future frames."
 (add-hook 'web-mode-hook (lambda () (interactive) (column-marker-1 100)))
 (add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 100)))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(js-indent-level 2)
- '(package-selected-packages
-   (quote
-    (quack geiser yasnippet whitespace-cleanup-mode web-mode solarized-theme smex req-package rainbow-delimiters php-extras org-bullets multi-term ido-vertical-mode ido-completing-read+ flx-ido exec-path-from-shell el-get discover diff-hl counsel company-quickhelp auto-highlight-symbol))))
+(setq-default js-indent-level 2)
 
 ;; Tern Config ;;
-(add-to-list 'load-path "~/Documents/tern/emacs/")
-(autoload 'tern-mode "tern.el" nil t)
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+;; (add-to-list 'load-path "~/Documents/tern/emacs/")
+;; (autoload 'tern-mode "tern.el" nil t)
+;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
 
 ;; Css/Scss config ;;
 (add-hook 'css-mode-hook
 	  (lambda ()
 	    (rainbow-mode)
-	    (setq css-indent-offset 2)))
+	    (setq-default css-indent-offset 2)))
 (add-hook 'scss-mode-hook 'rainbow-mode)
-(setq scss-compile-at-save nil)
+(setq-default scss-compile-at-save nil)
 
 ;; adding a less config
 (use-package less-css-mode
@@ -426,18 +374,18 @@ other, future frames."
 ;; Php-mode ;;
 (defun php-editing-config ()
   "Php editing package configurations."
-  (setq php-executable "/usr/bin/php")
-  (load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el")
+  (setq-default php-executable "/usr/bin/php")
   (use-package php-mode
     :ensure t
     :config
     (add-hook 'php-mode-hook 'flycheck-mode))
+    ;; (load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el"))
   (use-package php-extras
     :ensure t))
 (php-editing-config)
 
 ;; Tramp Customizations ;;
-(setq tramp-verbose 10)
+(setq-default tramp-verbose 10)
 
 ;; rainbows ;;
 (use-package rainbow-delimiters
@@ -451,8 +399,13 @@ other, future frames."
   (add-hook 'js-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'rust-mode-hook 'rainbow-delimiters-mode))
 
-(load-file "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
-(require 'ssh-connects)
+(defun load-ssh-file ()
+  "Requires file containing functions for connecting to servers over ssh."
+  (load-file "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
+  (require 'ssh-connects))
+
+(if (file-exists-p "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
+    (load-ssh-file))
 
 (use-package geiser
   :ensure t)
@@ -470,6 +423,14 @@ other, future frames."
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (quack geiser rainbow-delimiters php-extras yasnippet whitespace-cleanup-mode web-mode use-package solarized-theme smex php-mode org-bullets multi-term ido-vertical-mode ido-completing-read+ flycheck flx-ido exec-path-from-shell discover diff-hl counsel company-quickhelp auto-highlight-symbol))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
