@@ -1,6 +1,6 @@
 ;;; Package --- Emacs Config
 ;;; Commentary:
-;;; This is my Emacs configuration for work
+;;; This is my Emacs configuration for work and fun.
 
 ;;; Code:
 (setq user-full-name "Jonathan Stefani")
@@ -121,7 +121,9 @@ THEME-FUNCTION: function that initializes the themes and settings."
 ;; A lot of font modifications, all pretty much stolen from:
 ;; https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.org
 (setq default-font "Inconsolata")
-(setq default-font-size 17)
+(if (eq system-type 'darwin)
+    (setq default-font-size 17)
+  (setq default-font-size 15))
 (setq current-font-size default-font-size)
 (setq font-change-increment 1.1)
 
@@ -208,7 +210,7 @@ other, future frames."
 (use-package yasnippet
   :ensure t)
 
-(use-package req-package
+(use-package company
   :ensure t
   :config
   (progn (setq company-idle-delay 0)
@@ -339,6 +341,16 @@ other, future frames."
 (add-hook 'web-mode-hook (lambda () (interactive) (column-marker-1 100)))
 (add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 100)))
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(js-indent-level 2)
+ '(package-selected-packages
+   (quote
+    (quack geiser yasnippet whitespace-cleanup-mode web-mode solarized-theme smex req-package rainbow-delimiters php-extras org-bullets multi-term ido-vertical-mode ido-completing-read+ flx-ido exec-path-from-shell el-get discover diff-hl counsel company-quickhelp auto-highlight-symbol))))
+
 ;; Tern Config ;;
 (add-to-list 'load-path "~/Documents/tern/emacs/")
 (autoload 'tern-mode "tern.el" nil t)
@@ -412,15 +424,17 @@ other, future frames."
   (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
 
 ;; Php-mode ;;
-(load-file "~/.emacs.d/elispConfigFiles/php-mode.el")
-(load-file "~/.emacs.d/elispConfigFiles/php-extras.el")
-(load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el")
-
-(require 'php-mode)
-(require 'php-extras)
-
-(setq php-executable "/usr/bin/php")
-(add-hook 'php-mode-hook 'flycheck-mode)
+(defun php-editing-config ()
+  "Php editing package configurations."
+  (setq php-executable "/usr/bin/php")
+  (load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el")
+  (use-package php-mode
+    :ensure t
+    :config
+    (add-hook 'php-mode-hook 'flycheck-mode))
+  (use-package php-extras
+    :ensure t))
+(php-editing-config)
 
 ;; Tramp Customizations ;;
 (setq tramp-verbose 10)
@@ -440,6 +454,12 @@ other, future frames."
 (load-file "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
 (require 'ssh-connects)
 
+(use-package geiser
+  :ensure t)
+
+(use-package quack
+  :ensure t)
+
 ; ################################ ;
 ;;;; Emacs Config No Man's Land ;;;;
 ; ###############################  ;
@@ -450,15 +470,6 @@ other, future frames."
 
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(js-indent-level 2)
- '(package-selected-packages
-   (quote
-    (epa-file company-quickhelp zenburn beacon zenburn-theme yaml-mode whitespace-cleanup-mode web-mode web-beautify tern solarized-theme smooth-scrolling smex slime scss-mode restclient req-package rainbow-mode rainbow-delimiters racer prettier-js powerline phpcbf php-extras panda-theme org-bullets org-alert nord-theme neotree multi-term moe-theme mode-icons markdown-mode magit lsp-python lsp-javascript-typescript less-css-mode json-mode jsfmt js-format irony-eldoc indent-guide ido-vertical-mode ido-ubiquitous highlight-symbol highlight-indent-guides helm gruber-darker-theme git-messenger git-gutter geben flycheck-pos-tip flycheck-popup-tip flycheck-color-mode-line flx-ido exec-path-from-shell eslintd-fix eslint-fix engine-mode eclim dumb-jump dracula-theme discover diff-hl counsel-projectile company-racer company-php company-lsp company-irony company-flx column-marker color-theme-sanityinc-tomorrow cmake-ide cider base16-theme avy auto-highlight-symbol apropospriate-theme all-the-icons-ivy))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
