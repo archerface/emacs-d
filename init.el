@@ -126,7 +126,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
-  (concat default-font "-" (number-to-string default-font-size)))
+  (concat 'default-font "-" (number-to-string 'default-font-size)))
 
 (defun set-font-size ()
   "Set the font to `default-font' at `current-font-size'.
@@ -258,9 +258,6 @@ other, future frames."
 		ad-do-it)
 	adaad-do-it))
 
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
-
 ;; flycheck config
 (use-package flycheck
 	:ensure t
@@ -299,9 +296,10 @@ other, future frames."
 (setq-default js-indent-level 2)
 
 ;; Tern Config ;;
-;; (add-to-list 'load-path "~/Documents/tern/emacs/")
-;; (autoload 'tern-mode "tern.el" nil t)
-;; (add-hook 'js-mode-hook (lambda () (tern-mode t)))
+(use-package tern
+  :ensure t
+  :config
+  (add-hook 'js-mode-hook (lambda () (tern-mode t))))
 
 ;; Css/Scss config ;;
 (add-hook 'css-mode-hook
@@ -411,10 +409,6 @@ other, future frames."
 
 (use-package quack
   :ensure t)
-
-; ################################ ;
-;;;; Emacs Config No Man's Land ;;;;
-; ###############################  ;
 
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
