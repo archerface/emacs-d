@@ -288,8 +288,21 @@ other, future frames."
 
 (add-to-list 'auto-mode-alist '("\\.jsx?$" . js-mode))
 
-(add-hook 'web-mode-hook (lambda () (interactive) (column-marker-1 100)))
-(add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 100)))
+(use-package fill-column-indicator
+  :ensure t
+  :hook (js-mode-hook web-mode-hook))
+
+(use-package prettier-js
+  :ensure t
+  :config
+  (setq-default prettier-js-args
+                '("--trailing-comma" "all"
+                  "--bracket-spacing" "false"
+                  "--tab-width" "2"
+                  "--print-width" "90"
+                  "--no-semi"
+                  "--single-quote"
+                  "--arrow-parens" "avoid")))
 
 (setq-default js-indent-level 2)
 
