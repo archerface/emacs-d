@@ -49,6 +49,9 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+(use-package delight
+  :ensure t)
+
 (use-package exec-path-from-shell
   :ensure t
 	:init
@@ -86,22 +89,12 @@
   (setq scroll-conservatively 100000)
   (setq scroll-preserve-screen-position 1))
 
-(defun set-solarized-theme ()
-  "Set up and run solarized theme."
-  (use-package solarized-theme
+(defun set-theme ()
+  "Set up theme."
+  (use-package ample-theme
     :ensure t
-    :pin melpa-stable
-    :init
-    (fringe-mode 15)
-    (setq-default solarized-use-variable-pitch nil)
-    (setq-default solarized-high-contrast-mode-line nil)
-    (setq-default solarized-use-less-bold t)
-    (setq-default solarized-use-more-italic nil)
-    (setq-default solarized-emphasize-indicators t)
-    (setq-default solarized-scale-org-headlines nil)
-    (setq x-underline-at-descent-line t)
     :config
-    (load-theme 'solarized-dark t)))
+    (load-theme 'ample t)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -117,7 +110,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
 ;; UI specific functions
 (ui-settings)
 (global-editor-settings)
-(apply-theme 'set-solarized-theme)
+(apply-theme 'set-theme)
 
 (setq-default default-font "Inconsolata")
 (if (eq system-type 'darwin)
@@ -126,7 +119,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
-  (concat 'default-font "-" (number-to-string 'default-font-size)))
+  (concat default-font "-" (number-to-string default-font-size)))
 
 (defun set-font-size ()
   "Set the font to `default-font' at `current-font-size'.
@@ -138,7 +131,8 @@ other, future frames."
 (set-font-size)
 
 (use-package multi-term
-  :ensure t)
+  :ensure t
+  :delight)
 (defun multi-term-fish ()
   "Make multiterm use fish."
   (interactive)
@@ -169,10 +163,12 @@ other, future frames."
 (electric-pair-mode 1)
 
 (use-package yasnippet
-  :ensure t)
+  :ensure t
+  :delight)
 
 (use-package company
   :ensure t
+  :delight
   :config
   (setq-default company-dabbrev-code-other-buffer 'all)
 	(setq-default company-code-everywhere t)
@@ -188,9 +184,10 @@ other, future frames."
   (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package company-quickhelp
-	     :ensure t
-	     :config
-       (company-quickhelp-mode 1))
+  :ensure t
+  :delight
+  :config
+  (company-quickhelp-mode 1))
 
 (provide 'init-company)
 
@@ -261,6 +258,7 @@ other, future frames."
 ;; flycheck config
 (use-package flycheck
 	:ensure t
+  :delight
 	:init
 	(setq-default flycheck-highlighting-mode 'lines)
 	(setq-default flycheck-disabled-checkers '(javascript-jshint))
@@ -320,6 +318,7 @@ other, future frames."
 
 (use-package whitespace-cleanup-mode
   :ensure t
+  :delight
   :init
   (global-whitespace-cleanup-mode 1))
 
@@ -342,6 +341,7 @@ other, future frames."
 ;; Ivy Config
 (use-package ivy
   :ensure t
+  :delight
   :init
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
