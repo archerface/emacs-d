@@ -67,6 +67,7 @@
   (blink-cursor-mode 0)
   (global-hl-line-mode t)
   (line-number-mode t)
+  (global-linum-mode)
   (column-number-mode t)
   (size-indication-mode t)
   (setq ring-bell-function 'ignore)
@@ -91,10 +92,12 @@
 
 (defun set-theme ()
   "Set up theme."
-  (use-package ample-theme
+  (use-package color-theme-sanityinc-tomorrow
     :ensure t
+    :init
+    (fringe-mode 10)
     :config
-    (load-theme 'ample t)))
+    (load-theme 'sanityinc-tomorrow-eighties t)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -294,10 +297,11 @@ other, future frames."
 
 (use-package prettier-js
   :ensure t
+  :bind ("C-c p" . prettier-js)
   :config
   (setq-default prettier-js-args
-                '("--trailing-comma" "all"
-                  "--bracket-spacing" "false"
+                '("--trailing-comma" "none"
+                  "--bracket-spacing" "true"
                   "--tab-width" "2"
                   "--print-width" "90"
                   "--no-semi"
@@ -311,6 +315,9 @@ other, future frames."
   :ensure t
   :config
   (add-hook 'js-mode-hook (lambda () (tern-mode t))))
+
+(use-package json-mode
+  :ensure t)
 
 ;; Css/Scss config ;;
 (add-hook 'css-mode-hook
@@ -436,7 +443,7 @@ other, future frames."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (quack geiser rainbow-delimiters php-extras yasnippet whitespace-cleanup-mode web-mode use-package solarized-theme smex php-mode org-bullets multi-term ido-vertical-mode ido-completing-read+ flycheck flx-ido exec-path-from-shell discover diff-hl counsel company-quickhelp auto-highlight-symbol))))
+    (json-mode quack geiser rainbow-delimiters php-extras yasnippet whitespace-cleanup-mode web-mode use-package solarized-theme smex php-mode org-bullets multi-term ido-vertical-mode ido-completing-read+ flycheck flx-ido exec-path-from-shell discover diff-hl counsel company-quickhelp auto-highlight-symbol))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
