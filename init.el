@@ -13,6 +13,12 @@
 (setq debug-on-error t)
 (setq require-final-newline t)
 
+;; Get rid of those damn custom variables being written to my init.el file
+(defun package--save-selected-packages (&rest opt)
+  "Because the custom variables being written to this file piss me off.
+`OPT' is optional arguments defined by the system."
+  nil)
+
 ;; Modern encoding, yay
 (setq locale-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8)
@@ -92,12 +98,13 @@
 
 (defun set-theme ()
   "Set up theme."
-  (use-package color-theme-sanityinc-tomorrow
+  (use-package nord-theme
     :ensure t
     :init
     (fringe-mode 10)
+    (setq nord-comment-brightness 15)
     :config
-    (load-theme 'sanityinc-tomorrow-eighties t)))
+    (load-theme 'nord t)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -291,13 +298,11 @@ other, future frames."
 
 (add-to-list 'auto-mode-alist '("\\.jsx?$" . js-mode))
 
-(use-package fill-column-indicator
-  :ensure t
-  :hook (js-mode-hook web-mode-hook))
-
 (use-package prettier-js
   :ensure t
   :bind ("C-c p" . prettier-js)
+  :hook
+  (js-mode)
   :config
   (setq-default prettier-js-args
                 '("--trailing-comma" "none"
@@ -436,17 +441,3 @@ other, future frames."
 
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (json-mode quack geiser rainbow-delimiters php-extras yasnippet whitespace-cleanup-mode web-mode use-package solarized-theme smex php-mode org-bullets multi-term ido-vertical-mode ido-completing-read+ flycheck flx-ido exec-path-from-shell discover diff-hl counsel company-quickhelp auto-highlight-symbol))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
