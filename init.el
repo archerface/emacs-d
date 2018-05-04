@@ -98,13 +98,12 @@
 
 (defun set-theme ()
   "Set up theme."
-  (use-package nord-theme
+  (use-package color-theme-sanityinc-tomorrow
     :ensure t
     :init
     (fringe-mode 10)
-    (setq nord-comment-brightness 15)
     :config
-    (load-theme 'nord t)))
+    (load-theme 'sanityinc-tomorrow-night t)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
