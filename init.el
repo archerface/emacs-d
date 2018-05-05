@@ -37,8 +37,10 @@
   "Set up Emacs package manager with use-package."
   (require 'package)
   (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives
-	       '("marmalade" . "https://marmalade-repo.org/packages/") t)
+  (if (eq system-type 'ms-dos)
+          (nil)
+          (add-to-list 'package-archives
+                       '("marmalade" . "https://marmalade-repo.org/packages/") t))
   (add-to-list 'package-archives
 	       '("melpa" . "http://melpa.org/packages/") t)
   (add-to-list 'package-archives
@@ -400,9 +402,11 @@ other, future frames."
     :ensure t
     :config
     (add-hook 'php-mode-hook 'flycheck-mode))
-    ;; (load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el"))
-  (use-package php-extras
-    :ensure t))
+  ;; (load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el"))
+  (if (eq (memq window-system '(ms-dos)) nil)
+      (use-package php-extras
+        :ensure t)))
+
 (php-editing-config)
 
 ;; Tramp Customizations ;;
