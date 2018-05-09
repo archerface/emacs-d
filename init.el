@@ -100,12 +100,16 @@
 
 (defun set-theme ()
   "Set up theme."
-  (use-package color-theme-sanityinc-tomorrow
+  (use-package solarized-theme
     :ensure t
     :init
-    (fringe-mode 10)
+    (setq solarized-distinct-fringe-background nil)
+    (setq solarized-use-variable-pitch nil)
+    (setq x-underline-at-descent-line t)
+    (setq solarized-use-more-italic t)
+    (setq x-underline-at-descent-line t)
     :config
-    (load-theme 'sanityinc-tomorrow-night t)))
+    (load-theme 'solarized-dark t)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -438,9 +442,26 @@ other, future frames."
 (use-package quack
   :ensure t)
 
+;; (use-package pomodoro
+;;   :ensure t)
+
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
 ;; Use C-SPC C-SPC to set a marked location, navigate away. Then hit C-u C-SPC and you will return to the marked position ;;
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (pomodoro quack geiser rainbow-delimiters php-extras php-mode counsel ivy org-bullets discover whitespace-cleanup-mode auto-highlight-symbol less-css-mode json-mode tern prettier-js flycheck web-mode diff-hl smex ido-vertical-mode flx-ido ido-completing-read+ company-quickhelp company yasnippet multi-term color-theme-sanityinc-tomorrow exec-path-from-shell delight use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
