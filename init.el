@@ -100,16 +100,12 @@
 
 (defun set-theme ()
   "Set up theme."
-  (use-package solarized-theme
+  (use-package doom-themes
     :ensure t
-    :init
-    (setq solarized-distinct-fringe-background nil)
-    (setq solarized-use-variable-pitch nil)
-    (setq x-underline-at-descent-line t)
-    (setq solarized-use-more-italic t)
-    (setq x-underline-at-descent-line t)
     :config
-    (load-theme 'solarized-dark t)))
+    (load-theme 'doom-vibrant t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-org-config)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -241,6 +237,9 @@ other, future frames."
   :init
   (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
   (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode))
+
+(use-package magit
+  :ensure t)
 
 (use-package web-mode
   :ensure t
@@ -451,17 +450,3 @@ other, future frames."
 
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (pomodoro quack geiser rainbow-delimiters php-extras php-mode counsel ivy org-bullets discover whitespace-cleanup-mode auto-highlight-symbol less-css-mode json-mode tern prettier-js flycheck web-mode diff-hl smex ido-vertical-mode flx-ido ido-completing-read+ company-quickhelp company yasnippet multi-term color-theme-sanityinc-tomorrow exec-path-from-shell delight use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
