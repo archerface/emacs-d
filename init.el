@@ -53,8 +53,9 @@
 (sensible-defaults/use-all-keybindings)
 (init-package-manager)
 
+(package-refresh-contents)
+
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
   (package-install 'use-package))
 
 (use-package delight
@@ -200,6 +201,11 @@ other, future frames."
   :config
   (company-quickhelp-mode 1))
 
+(use-package company-lsp
+  :ensure t
+  :config
+  (push 'company-lsp company-backends))
+
 (provide 'init-company)
 
 ;; ido part
@@ -251,7 +257,11 @@ other, future frames."
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
+  :config
+  (setq web-mode-script-padding 0)
+  (setq web-mode-style-padding 0))
 
 ;; indentation adjustments for web-mode
 (defun my-web-mode-hook ()
@@ -269,6 +279,33 @@ other, future frames."
 		ad-do-it)
 	adaad-do-it))
 
+;; vue editing config
+(defun vue-mode-config-settings ()
+  "Function that collects all of the necessary packages and settings for vue."
+  (use-package smartparens
+    :ensure t
+    :delight
+    :config
+    (progn
+      (require 'smartparens-config)
+      (smartparens-global-mode 1))
+    (add-hook 'js-mode-hook #'smartparens-mode))
+  (use-package vue-mode
+    :ensure t
+    :config
+    (add-to-list 'vue-mode-hook #'smartparens-mode)
+    (add-to-list 'vue-mode-hook 'web-mode)
+    (setq mmm-submode-decoration-level 2))
+  (use-package lsp-mode
+    :ensure t)
+  (use-package lsp-vue
+    :requires (lsp-mode)
+    :ensure t
+    :config
+    (add-hook 'vue-mode-hook #'lsp-vue-mmm-enable)))
+
+
+
 ;; flycheck config
 (use-package flycheck
 	:ensure t
@@ -280,6 +317,12 @@ other, future frames."
 	(add-hook 'after-init-hook 'global-flycheck-mode)
 	(flycheck-add-mode 'javascript-eslint 'web-mode)
 	(flycheck-add-mode 'javascript-eslint 'js-mode))
+
+(use-package lsp-ui
+  :requires (lsp-mode flycheck)
+  :ensure t
+	:config
+	(add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
 (defun use-eslint-from-node-modules ()
   "Function to use local eslint executable if it is available."
@@ -441,8 +484,20 @@ other, future frames."
 (use-package quack
   :ensure t)
 
-;; (use-package pomodoro
-;;   :ensure t)
+(use-package racket-mode
+  :ensure t
+  :config
+  (add-hook 'racket-mode-hook      #'racket-unicode-input-method-enable)
+  (add-hook 'racket-repl-mode-hook #'racket-unicode-input-method-enable))
+
+(use-package pomidor
+  :ensure t
+  :init
+  (setq alert-default-style 'libnotify)
+  :config
+  (global-set-key (kbd "<f5>") #'pomidor)
+   (setq pomidor-play-sound-file
+      nil))
 
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
