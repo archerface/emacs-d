@@ -261,7 +261,8 @@ other, future frames."
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
   :config
   (setq web-mode-script-padding 0)
-  (setq web-mode-style-padding 0))
+  (setq web-mode-style-padding 0)
+  (setq web-mode-enable-auto-pairing t))
 
 ;; indentation adjustments for web-mode
 (defun my-web-mode-hook ()
@@ -369,6 +370,9 @@ other, future frames."
   (add-hook 'js-mode-hook (lambda () (tern-mode t))))
 
 (use-package json-mode
+  :ensure t)
+
+(use-package rainbow-mode
   :ensure t)
 
 ;; Css/Scss config ;;
@@ -490,6 +494,9 @@ other, future frames."
   (add-hook 'racket-mode-hook      #'racket-unicode-input-method-enable)
   (add-hook 'racket-repl-mode-hook #'racket-unicode-input-method-enable))
 
+(use-package cider
+  :ensure t)
+
 (use-package pomidor
   :ensure t
   :init
@@ -505,3 +512,17 @@ other, future frames."
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
