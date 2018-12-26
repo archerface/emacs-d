@@ -67,6 +67,11 @@
 	(when (memq window-system '(mac ns x))
 		(exec-path-from-shell-initialize)))
 
+(use-package autopair
+  :ensure t
+  :init
+  (autopair-global-mode))
+
 (defun ui-settings ()
   "GUI settings for Emacs."
   (tool-bar-mode 0)
@@ -492,14 +497,14 @@ other, future frames."
 (use-package geiser
   :ensure t)
 
-(use-package quack
-  :ensure t)
+;; (use-package quack
+;;   :ensure t)
 
-(use-package racket-mode
-  :ensure t
-  :config
-  (add-hook 'racket-mode-hook      #'racket-unicode-input-method-enable)
-  (add-hook 'racket-repl-mode-hook #'racket-unicode-input-method-enable))
+;; (use-package racket-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'racket-mode-hook      #'racket-unicode-input-method-enable)
+;;   (add-hook 'racket-repl-mode-hook #'racket-unicode-input-method-enable))
 
 (use-package cider
   :ensure t)
@@ -512,6 +517,16 @@ other, future frames."
   (global-set-key (kbd "<f5>") #'pomidor)
    (setq pomidor-play-sound-file
       nil))
+
+(setq inferior-lisp-program "~/Documents/Programs/ccl/lx86cl64")
+(setq slime-contribs '(slime-fancy))
+(use-package slime
+  :ensure t
+  :config
+  (add-hook 'slime-mode-hook
+            (lambda ()
+              (unless (slime-connected-p)
+                (save-excursion (slime))))))
 
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
