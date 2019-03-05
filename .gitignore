@@ -9,6 +9,8 @@ auto-save-list
 tramp
 .\#*
 .cache/
+projectile.cache
+irony/
 
 # Org-mode
 .org-id-locations
