@@ -37,14 +37,16 @@
   "Set up Emacs package manager with use-package."
   (require 'package)
   (setq package-enable-at-startup nil)
-  (if (eq system-type 'ms-dos)
-          (nil)
-          (add-to-list 'package-archives
-                       '("marmalade" . "https://marmalade-repo.org/packages/") t))
-  (add-to-list 'package-archives
-	       '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-	       '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  (setq package-archives
+        '(("GNU ElPA")
+          ("Marmalade" . "https://marmalade-repo.org/packages/")
+	        ("MELPA" . "http://melpa.org/packages/")
+	        ("MELPA Stable" . "http://stable.melpa.org/packages/"))
+         package-archive-priorities
+         '(("GNU ELPA" . 10)
+           ("MELPA Stable" . 5)
+           ("Marmalade" . 2)
+           ("MELPA". 0)))
   (setq-default package-archive-enable-alist '(("melpa" deft magit)))
   (package-initialize))
 
@@ -52,8 +54,6 @@
 (sensible-defaults/use-all-settings)
 (sensible-defaults/use-all-keybindings)
 (init-package-manager)
-
-(package-refresh-contents)
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -66,11 +66,6 @@
 	:init
 	(when (memq window-system '(mac ns x))
 		(exec-path-from-shell-initialize)))
-
-(use-package autopair
-  :ensure t
-  :init
-  (autopair-global-mode))
 
 (defun ui-settings ()
   "GUI settings for Emacs."
@@ -102,16 +97,29 @@
   (setq-default x-select-enable-clipboard t)
   (setq scroll-margin 0)
   (setq scroll-conservatively 100000)
-  (setq scroll-preserve-screen-position 1))
+  (setq scroll-preserve-screen-position 1)
+  (electric-pair-mode t))
 
 (defun set-theme ()
   "Set up theme."
+  (fringe-mode 10)
+  (setq doom-themes-enable-bold t)
+  (setq doom-themes-enable-italic t)
+  (setq x-underline-at-descent-line t)
   (use-package doom-themes
     :ensure t
     :config
-    (load-theme 'doom-vibrant t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-org-config)))
+    (load-theme 'doom-dracula t)
+    (doom-themes-org-config))
+  (use-package powerline
+    :ensure t
+    :config
+    (powerline-center-theme))
+  (use-package smart-mode-line
+    :ensure t
+    :config
+    (sml/setup)
+    (setq sml/theme 'respectful)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -130,9 +138,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
 (apply-theme 'set-theme)
 
 (setq-default default-font "Inconsolata")
-(if (eq system-type 'darwin)
-    (setq-default default-font-size 17)
-  (setq-default default-font-size 15))
+(setq-default default-font-size 15)
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
@@ -150,12 +156,6 @@ other, future frames."
 (use-package multi-term
   :ensure t
   :delight)
-(defun multi-term-fish ()
-  "Make multiterm use fish."
-  (interactive)
-  (setq ansi-term-color-vector [term term-color-black term-color-red term-color-green term-color-yellow term-color-blue term-color-magenta term-color-cyan term-color-white])
-  (let ((multi-term-program "/usr/local/bin/fish"))
-    (multi-term)))
 
 ;; Key Bindings ;;
 (global-set-key (kbd "C-x p") 'eval-buffer)
@@ -177,7 +177,10 @@ other, future frames."
 (global-set-key (kbd "C-x 2") 'split-window-below-and-switch)
 (global-set-key (kbd "C-x 3") 'split-window-right-and-switch)
 
-(electric-pair-mode 1)
+(use-package smartparens
+  :ensure t
+  :config
+  (show-smartparens-global-mode t))
 
 (use-package yasnippet
   :ensure t
@@ -212,6 +215,11 @@ other, future frames."
   (push 'company-lsp company-backends))
 
 (provide 'init-company)
+
+(use-package rust-mode
+  :ensure t
+  :config
+  (setq-default rust-format-on-save t))
 
 ;; ido part
 (use-package ido-completing-read+
@@ -285,6 +293,38 @@ other, future frames."
 		ad-do-it)
 	adaad-do-it))
 
+(use-package js2-mode
+  :ensure t
+  :config
+  (progn
+    (add-hook 'js-mode-hook 'js2-minor-mode)
+    (add-hook 'js2-minor-mode-hook #'js2-imenu-extras-mode)
+    (add-to-list 'interpreter-mode-alist '("node" . js2-mode))))
+
+(use-package js2-refactor
+  :ensure t
+  :config
+  (add-hook 'js2-minor-mode-hook #'js2-refactor-mode)
+  (js2r-add-keybindings-with-prefix "C-c C-r")
+  (define-key js2-mode-map (kbd "C-k") #'js2r-kill))
+
+(use-package xref-js2
+  :ensure t
+  :config
+  (progn
+    (define-key js-mode-map (kbd "M-.") nil)
+    (add-hook 'js2-minor-mode-hook
+              (lambda ()
+                (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))))
+
+;; (use-package 'company-tern
+;;   :ensure t
+;;   :config
+;;   (push 'company-tern company-backends)
+;;   (add-hook 'js2-minor-mode-hook (lambda ()
+;;                                    (tern-mode)
+;;                                    (company-mode))))
+
 ;; vue editing config
 (defun vue-mode-config-settings ()
   "Function that collects all of the necessary packages and settings for vue."
@@ -310,7 +350,10 @@ other, future frames."
     :config
     (add-hook 'vue-mode-hook #'lsp-vue-mmm-enable)))
 
-
+(use-package indium
+  :ensure t
+  :config
+  (add-hook 'js-mode-hook #'indium-interaction-mode))
 
 ;; flycheck config
 (use-package flycheck
@@ -322,7 +365,13 @@ other, future frames."
 	:config
 	(add-hook 'after-init-hook 'global-flycheck-mode)
 	(flycheck-add-mode 'javascript-eslint 'web-mode)
-	(flycheck-add-mode 'javascript-eslint 'js-mode))
+	(flycheck-add-mode 'javascript-eslint 'js-mode)
+	(flycheck-add-mode 'javascript-eslint 'js2-mode))
+
+(use-package flycheck-rust
+  :ensure t
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
 (use-package lsp-ui
   :requires (lsp-mode flycheck)
@@ -351,28 +400,7 @@ other, future frames."
 
 (add-to-list 'auto-mode-alist '("\\.jsx?$" . js-mode))
 
-(use-package prettier-js
-  :ensure t
-  :bind ("C-c p" . prettier-js)
-  :hook
-  (js-mode)
-  :config
-  (setq-default prettier-js-args
-                '("--trailing-comma" "none"
-                  "--bracket-spacing" "true"
-                  "--tab-width" "2"
-                  "--print-width" "90"
-                  "--no-semi"
-                  "--single-quote"
-                  "--arrow-parens" "avoid")))
-
 (setq-default js-indent-level 2)
-
-;; Tern Config ;;
-(use-package tern
-  :ensure t
-  :config
-  (add-hook 'js-mode-hook (lambda () (tern-mode t))))
 
 (use-package json-mode
   :ensure t)
@@ -456,20 +484,12 @@ other, future frames."
   (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
   (define-key read-expression-map (kbd "C-r") 'counsel-expression-history))
 
-;; Php-mode ;;
-(defun php-editing-config ()
-  "Php editing package configurations."
-  (setq-default php-executable "/usr/bin/php")
-  (use-package php-mode
-    :ensure t
-    :config
-    (add-hook 'php-mode-hook 'flycheck-mode))
-  ;; (load-file "~/.emacs.d/elispConfigFiles/php-extras-gen-eldoc.el"))
-  (if (eq (memq window-system '(ms-dos)) nil)
-      (use-package php-extras
-        :ensure t)))
-
-(php-editing-config)
+(use-package projectile
+  :ensure t
+  :config
+  (setq projectile-indexing-method 'alien)
+  (setq projectile-enable-caching t)
+  (projectile-mode 1))
 
 ;; Tramp Customizations ;;
 (setq-default tramp-verbose 10)
@@ -495,7 +515,9 @@ other, future frames."
     (load-ssh-file))
 
 (use-package geiser
-  :ensure t)
+  :ensure t
+  :config
+  (add-hook 'scheme-mode-hook (lambda (run-geiser))))
 
 ;; (use-package quack
 ;;   :ensure t)
@@ -518,7 +540,7 @@ other, future frames."
    (setq pomidor-play-sound-file
       nil))
 
-(setq inferior-lisp-program "~/Documents/Programs/ccl/lx86cl64")
+(setq-default inferior-lisp-program "~/Documents/programs/ccl/lx86cl64")
 (setq slime-contribs '(slime-fancy))
 (use-package slime
   :ensure t
@@ -539,12 +561,13 @@ other, future frames."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "100e7c5956d7bb3fd0eebff57fde6de8f3b9fafa056a2519f169f85199cc1c96" default))
  '(package-selected-packages
-   (quote
-    (magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol))))
+   '(magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(minimap-active-region-background ((t (:background "dark slate gray")))))
