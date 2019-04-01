@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; This is my Emacs configuration for work and fun.
 
+;; Added this to mess with pull requests.
+
 ;;; Code:
 (setq user-full-name "Jonathan Stefani")
 (setq user-mail-address "jon.stefani@gmail.com")
