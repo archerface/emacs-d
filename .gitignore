@@ -70,3 +70,5 @@ ido.last
 
 /elispConfigFiles/secrets/
 /elpa/
+
+session.*

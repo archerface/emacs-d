@@ -105,23 +105,13 @@
 (defun set-theme ()
   "Set up theme."
   (fringe-mode 10)
-  (setq doom-themes-enable-bold t)
-  (setq doom-themes-enable-italic t)
+  (setq solarized-distinct-fringe-background t)
+  ;; (setq solarized-high-contrast-mode-line t)
   (setq x-underline-at-descent-line t)
-  (use-package doom-themes
+  (use-package solarized-theme
     :ensure t
     :config
-    (load-theme 'doom-dracula t)
-    (doom-themes-org-config))
-  (use-package powerline
-    :ensure t
-    :config
-    (powerline-center-theme))
-  (use-package smart-mode-line
-    :ensure t
-    :config
-    (sml/setup)
-    (setq sml/theme 'respectful)))
+    (load-theme 'solarized-dark t)))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -140,11 +130,12 @@ THEME-FUNCTION: function that initializes the themes and settings."
 (apply-theme 'set-theme)
 
 (setq-default default-font "Inconsolata")
-(setq-default default-font-size 15)
+(setq-default default-font-size 16)
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
-  (concat default-font "-" (number-to-string default-font-size)))
+  (let ((font default-font) (font-size default-font-size))
+    (concat font "-" (number-to-string font-size))))
 
 (defun set-font-size ()
   "Set the font to `default-font' at `current-font-size'.
