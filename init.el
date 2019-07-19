@@ -111,7 +111,38 @@
   (use-package solarized-theme
     :ensure t
     :config
-    (load-theme 'solarized-dark t)))
+    (load-theme 'solarized-dark t))
+  (use-package nyan-mode
+    :ensure t
+    :delight
+    :config
+    (setq nyan-animate-nyancat 't)
+    (setq nyan-wavy-trail t)
+    (nyan-mode t)))
+
+(defun set-init-frame-size ()
+  "Set initial window frame size for graphical display."
+  (if (display-graphic-p)
+      (progn
+        (setq initial-frame-alist
+              '(
+                (tool-bar-lines . 0)
+                (width . 200) ; width in chars
+                (height . 125) ; height in lines
+                (background-color . "honeydew")
+                (left . 50)
+                (top 50)))
+        (setq default-frame-alist
+              '(
+                (tool-bar-lines . 0)
+                (width . 200)
+                (height . 125)
+                (background-color . "honeydew")
+                (left . 50)
+                (top . 50))))
+    (progn
+      (setq initial-frame-alist '( (tool-bar-lines . 0)))
+      (setq default-frame-alist '( (tool-bar-lines . 0))))))
 
 (defun apply-theme (theme-function)
   "Takes the theme set up function and apply it to the proper environemnts.
@@ -145,6 +176,7 @@ other, future frames."
     (add-to-list 'default-frame-alist (cons 'font font-code))
     (set-frame-font font-code)))
 (set-font-size)
+
 
 (use-package multi-term
   :ensure t
@@ -194,7 +226,19 @@ other, future frames."
 	(global-set-key (kbd "C-<tab>") 'company-dabbrev)
 	(global-set-key (kbd "M-<tab>") 'company-complete)
 	(global-set-key (kbd "C-c C-y") 'company-yasnippet)
+  ;; c/c++ stuff
+  ;; TODO: automate the creation of .dir-locals.el for project root
+  ;; needs to be something like this:
+  ;; ((nil . ((company-clang-arguments . ( LIST OF FILE PATHS AS STRINGS TO LOCAL HEADERS )))
+  ;;         ((company-c-headers-path-usr . ( LIST OF FILE PATHS AS STRINGS TO LOCAL HEADERS )))))
+  (setq company-backends (delete 'company-semantic company-backends))
   (add-hook 'after-init-hook 'global-company-mode))
+
+(use-package company-c-headers
+  :ensure t
+  :config
+  (add-to-list 'company-c-headers-path-system "/usr/include/c++/7.4.0/")
+  (add-to-list 'company-backends 'compay-c-headers))
 
 (use-package company-quickhelp
   :ensure t
@@ -206,8 +250,18 @@ other, future frames."
   :ensure t
   :config
   (push 'company-lsp company-backends))
-
 (provide 'init-company)
+
+(use-package cedet
+  :ensure t)
+
+(use-package semantic
+  :ensure t
+  :config
+  (global-semanticdb-minor-mode t)
+  (global-semantic-idle-scheduler-mode t)
+  (global-semantic-idle-summary-mode t)
+  (semantic-mode t))
 
 (use-package rust-mode
   :ensure t
@@ -334,7 +388,7 @@ other, future frames."
     :config
     (add-to-list 'vue-mode-hook #'smartparens-mode)
     (add-to-list 'vue-mode-hook 'web-mode)
-    (setq mmm-submode-decoration-level 2))
+    (setq-default mmm-submode-decoration-level 2))
   (use-package lsp-mode
     :ensure t)
   (use-package lsp-vue
@@ -482,7 +536,7 @@ other, future frames."
   :config
   (setq projectile-indexing-method 'alien)
   (setq projectile-enable-caching t)
-  (projectile-mode 1))
+  (projectile-mode t))
 
 ;; Tramp Customizations ;;
 (setq-default tramp-verbose 10)
@@ -553,6 +607,8 @@ other, future frames."
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   (add-hook 'irony-mode-hook 'turn-on-eldoc-mode))
 
+
+
 (use-package company-irony
   :ensure t
   :config
@@ -569,6 +625,25 @@ other, future frames."
   :ensure t
   :config
   (add-hook 'irony-mode-hook #'irony-eldoc))
+
+;; TODO: write a function that will automatically setup a GTAGS db for a project.
+(use-package ggtags
+  :ensure t
+  :config
+  (add-hook 'c-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'asm-mode)
+                (ggtags-mode 1))))
+  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
+  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+  ;; use this in conjunction with M-.
+  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
+  (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+  (setq-local eldoc-documentation-function #'ggtags-eldoc-function))
 
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
