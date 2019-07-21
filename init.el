@@ -430,7 +430,7 @@ other, future frames."
 (defun flycheck-c-variables ()
   "Set flycheck settings for c/c++."
   (setq flycheck-clang-include-path
-        '("~/jstefani/Documents/github/node/src/"))
+        '((getenv("NODE_PATH"))))
   (setq flycheck-clang-language-standard "c++11"))
 
 (use-package flycheck
