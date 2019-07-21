@@ -40,10 +40,10 @@
   (require 'package)
   (setq package-enable-at-startup nil)
   (setq package-archives
-        '(("GNU ElPA")
+        '(("GNU ElPA" . "https://elpa.gnu.org/packages/")
           ("Marmalade" . "https://marmalade-repo.org/packages/")
-	        ("MELPA" . "http://melpa.org/packages/")
-	        ("MELPA Stable" . "http://stable.melpa.org/packages/"))
+	  ("MELPA" . "http://melpa.org/packages/")
+	  ("MELPA Stable" . "http://stable.melpa.org/packages/"))
          package-archive-priorities
          '(("GNU ELPA" . 10)
            ("MELPA Stable" . 5)
@@ -55,10 +55,12 @@
 (load-file "~/.emacs.d/elispConfigFiles/sensible-defaults.el")
 (sensible-defaults/use-all-settings)
 (sensible-defaults/use-all-keybindings)
-(init-package-manager)
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+(eval-when-compile
+  (add-to-list 'load-path "~/.emacs.d/use-package")
+  (require 'use-package))
+
+(init-package-manager)
 
 (use-package delight
   :ensure t)
@@ -71,11 +73,12 @@
 
 (defun ui-settings ()
   "GUI settings for Emacs."
-  (tool-bar-mode 0)
-  (menu-bar-mode 0)
+  (when (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))
+  (menu-bar-mode -1)
   (when window-system
     (scroll-bar-mode -1))
-  (blink-cursor-mode 0)
+  (blink-cursor-mode -1)
   (global-hl-line-mode t)
   (line-number-mode t)
   (global-linum-mode)
@@ -93,32 +96,47 @@
   (show-paren-mode 1)
   (global-subword-mode 1)
   (global-prettify-symbols-mode t)
-  (setq-default tab-width 2)
-  (setq-default show-paren-delay 0)
-  (setq-default compilation-scroll-output t)
-  (setq-default x-select-enable-clipboard t)
-  (setq scroll-margin 0)
-  (setq scroll-conservatively 100000)
-  (setq scroll-preserve-screen-position 1)
+  (setq-default tab-width 2
+                show-paren-delay 0
+                compilation-scroll-output t
+                x-select-enable-clipboard t)
+  (setq scroll-margin 0
+        scroll-conservatively 100000
+        scroll-preserve-screen-position 1)
   (electric-pair-mode t))
 
 (defun set-theme ()
   "Set up theme."
   (fringe-mode 10)
-  (setq solarized-distinct-fringe-background t)
+  ;; (setq solarized-distinct-fringe-background t)
   ;; (setq solarized-high-contrast-mode-line t)
-  (setq x-underline-at-descent-line t)
-  (use-package solarized-theme
+  (use-package beacon
     :ensure t
     :config
-    (load-theme 'solarized-dark t))
+    (beacon-mode t))
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode t))
+  (setq x-underline-at-descent-line t)
+  (use-package monokai-theme
+    :ensure t
+    :config
+    (load-theme 'monokai t))
   (use-package nyan-mode
     :ensure t
     :delight
     :config
-    (setq nyan-animate-nyancat 't)
-    (setq nyan-wavy-trail t)
-    (nyan-mode t)))
+    (setq nyan-animate-nyancat 't
+          nyan-wavy-trail t
+          nyan-animation-frame-interval 0.1
+          nyan-minimum-window-width 100)
+    (nyan-mode t))
+  (use-package indent-guide
+    :ensure t
+    :config
+    (setq indent-guide-char "|")
+    (indent-guide-global-mode t)))
 
 (defun set-init-frame-size ()
   "Set initial window frame size for graphical display."
@@ -160,6 +178,13 @@ THEME-FUNCTION: function that initializes the themes and settings."
 (global-editor-settings)
 (apply-theme 'set-theme)
 
+(use-package sublimity
+  :ensure t
+  :config
+  (require 'sublimity-attractive)
+  ;; (setq-default sublimity-attractive-centering-width 110)
+  (sublimity-mode t))
+
 (setq-default default-font "Inconsolata")
 (setq-default default-font-size 16)
 
@@ -176,7 +201,6 @@ other, future frames."
     (add-to-list 'default-frame-alist (cons 'font font-code))
     (set-frame-font font-code)))
 (set-font-size)
-
 
 (use-package multi-term
   :ensure t
@@ -214,6 +238,8 @@ other, future frames."
 (use-package company
   :ensure t
   :delight
+  :init
+  (global-company-mode)
   :config
   (setq-default company-dabbrev-code-other-buffer 'all)
 	(setq-default company-code-everywhere t)
@@ -226,19 +252,9 @@ other, future frames."
 	(global-set-key (kbd "C-<tab>") 'company-dabbrev)
 	(global-set-key (kbd "M-<tab>") 'company-complete)
 	(global-set-key (kbd "C-c C-y") 'company-yasnippet)
-  ;; c/c++ stuff
-  ;; TODO: automate the creation of .dir-locals.el for project root
-  ;; needs to be something like this:
-  ;; ((nil . ((company-clang-arguments . ( LIST OF FILE PATHS AS STRINGS TO LOCAL HEADERS )))
-  ;;         ((company-c-headers-path-usr . ( LIST OF FILE PATHS AS STRINGS TO LOCAL HEADERS )))))
+  (setq company-backends (delete 'company-clang company-backends))
   (setq company-backends (delete 'company-semantic company-backends))
   (add-hook 'after-init-hook 'global-company-mode))
-
-(use-package company-c-headers
-  :ensure t
-  :config
-  (add-to-list 'company-c-headers-path-system "/usr/include/c++/7.4.0/")
-  (add-to-list 'company-backends 'compay-c-headers))
 
 (use-package company-quickhelp
   :ensure t
@@ -252,6 +268,13 @@ other, future frames."
   (push 'company-lsp company-backends))
 (provide 'init-company)
 
+(use-package rtags
+  :ensure t
+  :config
+  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+  (add-hook 'objc-mode-hook 'rtags-start-process-unless-running))
+
 (use-package cedet
   :ensure t)
 
@@ -262,11 +285,6 @@ other, future frames."
   (global-semantic-idle-scheduler-mode t)
   (global-semantic-idle-summary-mode t)
   (semantic-mode t))
-
-(use-package rust-mode
-  :ensure t
-  :config
-  (setq-default rust-format-on-save t))
 
 ;; ido part
 (use-package ido-completing-read+
@@ -343,15 +361,16 @@ other, future frames."
 (use-package js2-mode
   :ensure t
   :config
-  (progn
-    (add-hook 'js-mode-hook 'js2-minor-mode)
-    (add-hook 'js2-minor-mode-hook #'js2-imenu-extras-mode)
-    (add-to-list 'interpreter-mode-alist '("node" . js2-mode))))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+  (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
+;; (setq max-lisp-eval-depth 10000)
+(setq max-specpdl-size 5)
 
 (use-package js2-refactor
   :ensure t
   :config
-  (add-hook 'js2-minor-mode-hook #'js2-refactor-mode)
+  (add-hook 'js2-mode-hook #'js2-refactor-mode)
   (js2r-add-keybindings-with-prefix "C-c C-r")
   (define-key js2-mode-map (kbd "C-k") #'js2r-kill))
 
@@ -364,13 +383,18 @@ other, future frames."
               (lambda ()
                 (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))))
 
-;; (use-package 'company-tern
-;;   :ensure t
-;;   :config
-;;   (push 'company-tern company-backends)
-;;   (add-hook 'js2-minor-mode-hook (lambda ()
-;;                                    (tern-mode)
-;;                                    (company-mode))))
+(use-package tern
+  :ensure t
+  :config
+  (setq tern-command (append tern-command '("--no-port-file"))))
+
+(use-package company-tern
+  :ensure t
+  :config
+  (push 'company-tern company-backends)
+  (add-hook 'js2-minor-mode-hook (lambda ()
+                                   (tern-mode)
+                                   (company-mode))))
 
 ;; vue editing config
 (defun vue-mode-config-settings ()
@@ -392,7 +416,7 @@ other, future frames."
   (use-package lsp-mode
     :ensure t)
   (use-package lsp-vue
-    :requires (lsp-mode)
+    :requires (lsp-mode vue-mode)
     :ensure t
     :config
     (add-hook 'vue-mode-hook #'lsp-vue-mmm-enable)))
@@ -403,6 +427,12 @@ other, future frames."
   (add-hook 'js-mode-hook #'indium-interaction-mode))
 
 ;; flycheck config
+(defun flycheck-c-variables ()
+  "Set flycheck settings for c/c++."
+  (setq flycheck-clang-include-path
+        '("~/jstefani/Documents/github/node/src/"))
+  (setq flycheck-clang-language-standard "c++11"))
+
 (use-package flycheck
 	:ensure t
   :delight
@@ -413,12 +443,8 @@ other, future frames."
 	(add-hook 'after-init-hook 'global-flycheck-mode)
 	(flycheck-add-mode 'javascript-eslint 'web-mode)
 	(flycheck-add-mode 'javascript-eslint 'js-mode)
-	(flycheck-add-mode 'javascript-eslint 'js2-mode))
-
-(use-package flycheck-rust
-  :ensure t
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+	(flycheck-add-mode 'javascript-eslint 'js2-mode)
+  (flycheck-c-variables))
 
 (use-package lsp-ui
   :requires (lsp-mode flycheck)
@@ -533,6 +559,7 @@ other, future frames."
 
 (use-package projectile
   :ensure t
+  :delight
   :config
   (setq projectile-indexing-method 'alien)
   (setq projectile-enable-caching t)
@@ -550,8 +577,9 @@ other, future frames."
   (add-hook 'php-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'css-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'web-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'js-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'rust-mode-hook 'rainbow-delimiters-mode))
+  (add-hook 'js2-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'c-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'c++-mode-hook 'rainbow-delimiters-mode))
 
 (defun load-ssh-file ()
   "Requires file containing functions for connecting to servers over ssh."
@@ -598,28 +626,35 @@ other, future frames."
                 (save-excursion (slime))))))
 
 ;; requires libclang-dev to be installed on the system
+(defun custom-irony-mode-hook ()
+  "Make use of irony's async options."
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+
 (use-package irony
   :ensure t
   :config
+  (use-package company-irony
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-irony))
+  (use-package flycheck-irony
+    :ensure t
+    :config
+    (eval-after-load 'flycheck
+      '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
+  (use-package company-irony-c-headers
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-irony-c-headers))
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'objc-mode-hook 'irony-mode)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  (add-hook 'irony-mode-hook 'turn-on-eldoc-mode))
-
-
-
-(use-package company-irony
-  :ensure t
-  :config
-  (eval-after-load 'company
-    '(add-to-list 'company-backends 'company-irony)))
-
-(use-package flycheck-irony
-  :ensure t
-  :config
-  (eval-after-load 'flycheck
-    '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
+  (add-hook 'irony-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'irony-mode-hook 'custom-irony-mode-hook)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (use-package irony-eldoc
   :ensure t
@@ -657,9 +692,11 @@ other, future frames."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "100e7c5956d7bb3fd0eebff57fde6de8f3b9fafa056a2519f169f85199cc1c96" default))
+   (quote
+    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "100e7c5956d7bb3fd0eebff57fde6de8f3b9fafa056a2519f169f85199cc1c96" default)))
  '(package-selected-packages
-   '(magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol)))
+   (quote
+    (magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
