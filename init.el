@@ -31,8 +31,8 @@
 
 ;; Replace Splash Screen with org-mode scratch buffer ;;
 (setq inhibit-splash-screen t
-	  initial-scratch-message nil
-	  initial-major-mode 'org-mode)
+      initial-scratch-message nil
+      initial-major-mode 'org-mode)
 
 ;; Package Managers
 (defun init-package-manager ()
@@ -44,11 +44,11 @@
           ("Marmalade" . "https://marmalade-repo.org/packages/")
           ("MELPA" . "http://melpa.org/packages/")
           ("MELPA Stable" . "http://stable.melpa.org/packages/"))
-         package-archive-priorities
-         '(("GNU ELPA" . 10)
-           ("MELPA Stable" . 5)
-           ("Marmalade" . 2)
-           ("MELPA". 0)))
+        package-archive-priorities
+        '(("GNU ELPA" . 10)
+          ("MELPA Stable" . 5)
+          ("Marmalade" . 2)
+          ("MELPA". 0)))
   (setq-default package-archive-enable-alist '(("melpa" deft magit)))
   (package-initialize))
 
@@ -354,9 +354,9 @@ other, future frames."
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
   "Improves jsx highlighting for web-mode."
   (if (equal web-mode-content-type "jsx")
-	  (let ((web-mode-enable-part-face nil))
-		ad-do-it)
-	adaad-do-it))
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+    adaad-do-it))
 
 (use-package js2-mode
   :ensure t
@@ -455,13 +455,13 @@ other, future frames."
 (defun use-eslint-from-node-modules ()
   "Function to use local eslint executable if it is available."
   (let* ((root (locate-dominating-file
-				(or (buffer-file-name) default-directory)
-				"node_modules"))
-		 (eslint (and root
-					  (expand-file-name "node_modules/eslint/bin/eslint"
-										root))))
-	(when (and eslint (file-executable-p eslint))
-	  (setq-local flycheck-javascript-eslint-executable eslint))))
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint (and root
+                      (expand-file-name "node_modules/eslint/bin/eslint"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
 (add-hook 'flycheck-mode-hook #'use-eslint-from-node-modules)
 
 (setq-default indent-tabs-mode nil)
@@ -490,9 +490,9 @@ other, future frames."
 
 ;; Css/Scss config ;;
 (add-hook 'css-mode-hook
-	  (lambda ()
-	    (rainbow-mode)
-	    (setq-default css-indent-offset 2)))
+          (lambda ()
+            (rainbow-mode)
+            (setq-default css-indent-offset 2)))
 (add-hook 'scss-mode-hook 'rainbow-mode)
 (setq-default scss-compile-at-save nil)
 
@@ -604,8 +604,8 @@ other, future frames."
   (setq alert-default-style 'libnotify)
   :config
   (global-set-key (kbd "<f5>") #'pomidor)
-   (setq pomidor-play-sound-file
-      nil))
+  (setq pomidor-play-sound-file
+        nil))
 
 (setq-default inferior-lisp-program "~/Documents/programs/ccl/lx86cl64")
 (setq slime-contribs '(slime-fancy))
