@@ -42,8 +42,8 @@
   (setq package-archives
         '(("GNU ElPA" . "https://elpa.gnu.org/packages/")
           ("Marmalade" . "https://marmalade-repo.org/packages/")
-	  ("MELPA" . "http://melpa.org/packages/")
-	  ("MELPA Stable" . "http://stable.melpa.org/packages/"))
+          ("MELPA" . "http://melpa.org/packages/")
+          ("MELPA Stable" . "http://stable.melpa.org/packages/"))
          package-archive-priorities
          '(("GNU ELPA" . 10)
            ("MELPA Stable" . 5)
@@ -52,7 +52,7 @@
   (setq-default package-archive-enable-alist '(("melpa" deft magit)))
   (package-initialize))
 
-(load-file "~/.emacs.d/elispConfigFiles/sensible-defaults.el")
+(load-file "~/.emacs.d/sensible-defaults.el")
 (sensible-defaults/use-all-settings)
 (sensible-defaults/use-all-keybindings)
 
@@ -182,11 +182,11 @@ THEME-FUNCTION: function that initializes the themes and settings."
   :ensure t
   :config
   (require 'sublimity-attractive)
-  ;; (setq-default sublimity-attractive-centering-width 110)
+  (setq-default sublimity-attractive-centering-width 110)
   (sublimity-mode t))
 
 (setq-default default-font "Inconsolata")
-(setq-default default-font-size 16)
+(setq-default default-font-size 17)
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
@@ -580,14 +580,6 @@ other, future frames."
   (add-hook 'js2-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'c-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'c++-mode-hook 'rainbow-delimiters-mode))
-
-(defun load-ssh-file ()
-  "Requires file containing functions for connecting to servers over ssh."
-  (load-file "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
-  (require 'ssh-connects))
-
-(if (file-exists-p "~/.emacs.d/elispConfigFiles/secrets/ssh-connects.el")
-    (load-ssh-file))
 
 (use-package geiser
   :ensure t
