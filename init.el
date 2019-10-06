@@ -2,24 +2,21 @@
 ;;; Commentary:
 ;;; This is my Emacs configuration for work and fun.
 
-;; Added this to mess with pull requests.
-
+;;; Added this to mess with pull requests.
 ;;; Code:
 (setq user-full-name "Jonathan Stefani")
 (setq user-mail-address "jon.stefani@gmail.com")
 
 (defconst emacs-start-time (current-time))
-(unless noninteractive
-  (message "loading %s..." load-file-name))
-
+(unless noninteractive (message "loading %s..." load-file-name))
 (setq debug-on-error t)
 (setq require-final-newline t)
 
 ;; Get rid of those damn custom variables being written to my init.el file
-(defun package--save-selected-packages (&rest opt)
-  "Because the custom variables being written to this file piss me off.
-`OPT' is optional arguments defined by the system."
-  nil)
+;; (defun package--save-selected-packages
+;;     "Because the custom variables being written to this file piss me off. `OPT' is optional arguments defined by the system."
+;;   (&rest opt)
+;;     nil)
 
 ;; Modern encoding, yay
 (setq locale-coding-system 'utf-8)
@@ -100,8 +97,9 @@
                 show-paren-delay 0
                 compilation-scroll-output t
                 x-select-enable-clipboard t)
-  (setq scroll-margin 0
-        scroll-conservatively 100000
+  (setq scroll-margin 1
+        scroll-step 1
+        scroll-conservatively 10000
         scroll-preserve-screen-position 1)
   (electric-pair-mode t))
 
@@ -186,7 +184,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
   (sublimity-mode t))
 
 (setq-default default-font "Inconsolata")
-(setq-default default-font-size 17)
+(setq-default default-font-size 16)
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
@@ -267,13 +265,6 @@ other, future frames."
   :config
   (push 'company-lsp company-backends))
 (provide 'init-company)
-
-(use-package rtags
-  :ensure t
-  :config
-  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-  (add-hook 'objc-mode-hook 'rtags-start-process-unless-running))
 
 (use-package cedet
   :ensure t)
@@ -648,6 +639,13 @@ other, future frames."
   (add-hook 'irony-mode-hook 'custom-irony-mode-hook)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
+(use-package clang-format
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda () (add-hook 'before-save-hook
+                            'clang-format-buffer))))
+
 (use-package irony-eldoc
   :ensure t
   :config
@@ -671,6 +669,14 @@ other, future frames."
   (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
   (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
   (setq-local eldoc-documentation-function #'ggtags-eldoc-function))
+
+(use-package go-mode
+  :ensure t
+  :config
+  (add-hook 'before-save-hook 'gofmt-before-save))
+
+(use-package company-go
+  :ensure t)
 
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
