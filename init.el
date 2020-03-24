@@ -183,8 +183,8 @@ THEME-FUNCTION: function that initializes the themes and settings."
   (setq-default sublimity-attractive-centering-width 110)
   (sublimity-mode t))
 
-(setq-default default-font "Inconsolata")
-(setq-default default-font-size 16)
+(setq-default default-font "Jetbrains Mono")
+(setq-default default-font-size 13)
 
 (defun font-code ()
   "Return a string representing the current font (like \"Inconsolata-14\")."
@@ -678,6 +678,16 @@ other, future frames."
 (use-package company-go
   :ensure t)
 
+(use-package lsp-mode
+  :ensure t)
+
+(use-package rust-mode
+  :ensure t
+  :config
+  (add-hook 'rust-mode-hook (lambda () (setq indent-tabs-mode nil)))
+  (add-hook 'rust-mode-hook #'lsp)
+  (setq rust-format-on-save t))
+
 ;; Notes for using my Emacs ;;
 ;; Remember, to look up a function, use C-h f. This will allow you to look up functions. ;;
 ;; Use C-SPC C-SPC to set a marked location, navigate away. Then hit C-u C-SPC and you will return to the marked position ;;
@@ -694,7 +704,7 @@ other, future frames."
     ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "100e7c5956d7bb3fd0eebff57fde6de8f3b9fafa056a2519f169f85199cc1c96" default)))
  '(package-selected-packages
    (quote
-    (magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol))))
+    (rust-mode magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
