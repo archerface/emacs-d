@@ -26,6 +26,15 @@
 (prefer-coding-system 'utf-8)
 (set-language-environment 'utf-8)
 
+;; Mac Stuff
+(setq mac-command-modifier 'meta)
+(setq mac-option-modifier nil)
+
+(setq byte-compile-warnings '(cl-functions))
+
+(setq insert-directory-program "gls" dired-use-ls-dired t)
+(setq dired-listing-switches "-al --group-directories-first")
+
 ;; Replace Splash Screen with org-mode scratch buffer ;;
 (setq inhibit-splash-screen t
       initial-scratch-message nil
@@ -38,13 +47,11 @@
   (setq package-enable-at-startup nil)
   (setq package-archives
         '(("GNU ElPA" . "https://elpa.gnu.org/packages/")
-          ("Marmalade" . "https://marmalade-repo.org/packages/")
           ("MELPA" . "http://melpa.org/packages/")
           ("MELPA Stable" . "http://stable.melpa.org/packages/"))
         package-archive-priorities
         '(("GNU ELPA" . 10)
           ("MELPA Stable" . 5)
-          ("Marmalade" . 2)
           ("MELPA". 0)))
   (setq-default package-archive-enable-alist '(("melpa" deft magit)))
   (package-initialize))
@@ -117,10 +124,10 @@
     :config
     (which-key-mode t))
   (setq x-underline-at-descent-line t)
-  (use-package monokai-theme
+  (use-package dracula-theme
     :ensure t
     :config
-    (load-theme 'monokai t))
+    (load-theme 'dracula t))
   (use-package nyan-mode
     :ensure t
     :delight
@@ -183,7 +190,7 @@ THEME-FUNCTION: function that initializes the themes and settings."
   (setq-default sublimity-attractive-centering-width 110)
   (sublimity-mode t))
 
-(setq-default default-font "Jetbrains Mono")
+(setq-default default-font "Fira Code Retina")
 (setq-default default-font-size 13)
 
 (defun font-code ()
@@ -260,10 +267,10 @@ other, future frames."
   :config
   (company-quickhelp-mode 1))
 
-(use-package company-lsp
-  :ensure t
-  :config
-  (push 'company-lsp company-backends))
+;; (use-package company-lsp
+;;  :ensure t
+;;  :config
+;;  (push 'company-lsp company-backends))
 (provide 'init-company)
 
 (use-package cedet
@@ -379,13 +386,13 @@ other, future frames."
   :config
   (setq tern-command (append tern-command '("--no-port-file"))))
 
-(use-package company-tern
-  :ensure t
-  :config
-  (push 'company-tern company-backends)
-  (add-hook 'js2-minor-mode-hook (lambda ()
-                                   (tern-mode)
-                                   (company-mode))))
+;; (use-package company-tern
+;;  :ensure t
+;;  :config
+;;  (push 'company-tern company-backends)
+;;  (add-hook 'js2-minor-mode-hook (lambda ()
+;;                                   (tern-mode)
+;;                                   (company-mode))))
 
 ;; vue editing config
 (defun vue-mode-config-settings ()
@@ -700,11 +707,9 @@ other, future frames."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "100e7c5956d7bb3fd0eebff57fde6de8f3b9fafa056a2519f169f85199cc1c96" default)))
+   '("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "100e7c5956d7bb3fd0eebff57fde6de8f3b9fafa056a2519f169f85199cc1c96" default))
  '(package-selected-packages
-   (quote
-    (rust-mode magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol))))
+   '(dracula-theme rust-mode magit yasnippet whitespace-cleanup-mode web-mode vue-mode use-package tern solarized-theme smex rainbow-delimiters racket-mode quack prettier-js pomodoro pomidor php-extras org-bullets multi-term lsp-ui less-css-mode json-mode ido-vertical-mode ido-completing-read+ geiser flx-ido exec-path-from-shell doom-themes discover diff-hl delight counsel company-quickhelp company-lsp color-theme-sanityinc-tomorrow auto-highlight-symbol)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
