@@ -40,6 +40,8 @@
       initial-scratch-message nil
       initial-major-mode 'org-mode)
 
+(setq packages-to-install '(use-package))
+
 ;; Package Managers
 (defun init-package-manager ()
   "Set up Emacs package manager with use-package."
@@ -55,15 +57,13 @@
           ("MELPA". 0)))
   (setq-default package-archive-enable-alist '(("melpa" deft magit)))
   (package-initialize)
-  (when (cl-find-if-not #'package-installed-p '(use-package))
+  (when (cl-find-if-not #'package-installed-p packages-to-install)
     (package-refresh-contents)
-    (mapc #'package-install '(use-package))))
+    (mapc #'package-install packages-to-install)))
 
 (load-file "~/.emacs.d/sensible-defaults.el")
-(if (and (fboundp 'sensible-defaults/use-all-settings)
-         (fboundp 'sensible-defaults/use-all-keybindings)
-     (sensible-defaults/use-all-settings)
-     (sensible-defaults/use-all-keybindings)))
+(sensible-defaults/use-all-settings)
+(sensible-defaults/use-all-keybindings)
 
 (init-package-manager)
 
@@ -179,13 +179,6 @@ THEME-FUNCTION: function that initializes the themes and settings."
                   (funcall theme-function)))
     (funcall theme-function)))
 
-(defun check-function-defined-and-run (func-to-run args)
-  "Takes a function and check that the function is defined before running.
-FUNC-TO-RUN: potentially defined function.
-ARGS: list of arguments for the given function."
-  (if (fboundp 'func-to-run)
-      (apply 'func-to-run args)))
-
 ;; UI specific functions
 (ui-settings)
 (global-editor-settings)
@@ -239,10 +232,10 @@ other, future frames."
 (global-set-key (kbd "C-x 2") 'split-window-below-and-switch)
 (global-set-key (kbd "C-x 3") 'split-window-right-and-switch)
 
-(use-package smartparens
-  :ensure t
-  :config
-  (show-smartparens-global-mode t))
+;; (use-package smartparens
+;;   :ensure t
+;;   :config
+;;   (show-smartparens-global-mode t))
 
 (use-package yasnippet
   :ensure t
@@ -287,9 +280,9 @@ other, future frames."
 (use-package semantic
   :ensure t
   :config
-  (check-function-defined-and-run global-semanticdb-minor-mode t)
-  (check-function-defined-and-run global-semantic-idle-scheduler-mode t)
-  (check-function-defined-and-run global-semantic-idle-summary-mode t)
+  (global-semanticdb-minor-mode t)
+  (global-semantic-idle-scheduler-mode t)
+  (global-semantic-idle-summary-mode t)
   (semantic-mode t))
 
 ;; ido part
@@ -393,31 +386,6 @@ other, future frames."
   :ensure t
   :config
   (setq tern-command (append tern-command '("--no-port-file"))))
-
-;; vue editing config
-(defun vue-mode-config-settings ()
-  "Function that collects all of the necessary packages and settings for vue."
-  (use-package smartparens
-    :ensure t
-    :delight
-    :config
-    (progn
-      (require 'smartparens-config)
-      (smartparens-global-mode 1))
-    (add-hook 'js-mode-hook #'smartparens-mode))
-  (use-package vue-mode
-    :ensure t
-    :config
-    (add-to-list 'vue-mode-hook #'smartparens-mode)
-    (add-to-list 'vue-mode-hook 'web-mode)
-    (setq-default mmm-submode-decoration-level 2))
-  (use-package lsp-mode
-    :ensure t)
-  (use-package lsp-vue
-    :requires (lsp-mode vue-mode)
-    :ensure t
-    :config
-    (add-hook 'vue-mode-hook #'lsp-vue-mmm-enable)))
 
 (use-package indium
   :ensure t
