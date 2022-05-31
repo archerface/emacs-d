@@ -60,12 +60,10 @@
     (mapc #'package-install '(use-package))))
 
 (load-file "~/.emacs.d/sensible-defaults.el")
-(sensible-defaults/use-all-settings)
-(sensible-defaults/use-all-keybindings)
-
-;; (eval-when-compile
-;;   (add-to-list 'load-path "~/.emacs.d/use-package")
-;;   (require 'use-package))
+(if (and (fboundp 'sensible-defaults/use-all-settings)
+         (fboundp 'sensible-defaults/use-all-keybindings)
+     (sensible-defaults/use-all-settings)
+     (sensible-defaults/use-all-keybindings)))
 
 (init-package-manager)
 
@@ -181,6 +179,13 @@ THEME-FUNCTION: function that initializes the themes and settings."
                   (funcall theme-function)))
     (funcall theme-function)))
 
+(defun check-function-defined-and-run (func-to-run args)
+  "Takes a function and check that the function is defined before running.
+FUNC-TO-RUN: potentially defined function.
+ARGS: list of arguments for the given function."
+  (if (fboundp 'func-to-run)
+      (apply 'func-to-run args)))
+
 ;; UI specific functions
 (ui-settings)
 (global-editor-settings)
@@ -282,9 +287,9 @@ other, future frames."
 (use-package semantic
   :ensure t
   :config
-  (global-semanticdb-minor-mode t)
-  (global-semantic-idle-scheduler-mode t)
-  (global-semantic-idle-summary-mode t)
+  (check-function-defined-and-run global-semanticdb-minor-mode t)
+  (check-function-defined-and-run global-semantic-idle-scheduler-mode t)
+  (check-function-defined-and-run global-semantic-idle-summary-mode t)
   (semantic-mode t))
 
 ;; ido part
@@ -389,14 +394,6 @@ other, future frames."
   :config
   (setq tern-command (append tern-command '("--no-port-file"))))
 
-;; (use-package company-tern
-;;  :ensure t
-;;  :config
-;;  (push 'company-tern company-backends)
-;;  (add-hook 'js2-minor-mode-hook (lambda ()
-;;                                   (tern-mode)
-;;                                   (company-mode))))
-
 ;; vue editing config
 (defun vue-mode-config-settings ()
   "Function that collects all of the necessary packages and settings for vue."
@@ -489,7 +486,7 @@ other, future frames."
 (use-package rainbow-mode
   :ensure t)
 
-;; Css/Scss config ;;
+;; Css/Scss config
 (add-hook 'css-mode-hook
           (lambda ()
             (rainbow-mode)
