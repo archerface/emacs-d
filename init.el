@@ -54,15 +54,18 @@
           ("MELPA Stable" . 5)
           ("MELPA". 0)))
   (setq-default package-archive-enable-alist '(("melpa" deft magit)))
-  (package-initialize))
+  (package-initialize)
+  (when (cl-find-if-not #'package-installed-p '(use-package))
+    (package-refresh-contents)
+    (mapc #'package-install '(use-package))))
 
 (load-file "~/.emacs.d/sensible-defaults.el")
 (sensible-defaults/use-all-settings)
 (sensible-defaults/use-all-keybindings)
 
-(eval-when-compile
-  (add-to-list 'load-path "~/.emacs.d/use-package")
-  (require 'use-package))
+;; (eval-when-compile
+;;   (add-to-list 'load-path "~/.emacs.d/use-package")
+;;   (require 'use-package))
 
 (init-package-manager)
 
